@@ -1,0 +1,573 @@
+
+"openapi": "3.0.0"
+"info":
+  "title": "Traveler's Blog Backend API"
+  "description": "Backend API for the Traveler's Blog application. This API provides endpoints for user management and place management."
+  "version": "1.0.0"
+"schemes":
+- "http"
+"servers":
+  -
+    "url": "http://localhost:5000"
+"paths":
+  "/api/users":
+    "get":
+      "tags":
+        - "userRoute"
+      "summary": "Get all users"
+      "description": "Retrieve a list of all users."
+      "responses":
+        "200":
+          "description": "Successful retrieval of users."
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "properties":
+                  "users":
+                    "type": "array"
+                    "items":
+                      "type": "object"
+                      "properties":
+                        "_id":
+                          "type": "string"
+                          "description": "The unique identifier of the user."
+                        "name":
+                          "type": "string"
+                          "description": "The name of the user."
+                        "email":
+                          "type": "string"
+                          "description": "The email address of the user."
+                        "image":
+                          "type": "string"
+                          "description": "The profile image URL of the user."
+                      "required":
+                        - "name"
+                        - "email"
+                        - "image"
+        "500":
+          "description": "Internal server error."
+  "/api/users/signup":
+    "post":
+      "tags":
+        - "userRoute"
+      "summary": "User signup"
+      "description": "Register a new user."
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "properties":
+                "name":
+                  "type": "string"
+                  "description": "The name of the user."
+                "email":
+                  "type": "string"
+                  "description": "The email address of the user."
+                "password":
+                  "type": "string"
+                  "description": "The password of the user."
+                "image":
+                  "type": "string"
+                  "format": "binary"
+                  "description": "The profile image file of the user."
+              "required":
+                - "name"
+                - "email"
+                - "password"
+                - "image"
+      "responses":
+        "201":
+          "description": "User successfully registered."
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "properties":
+                  "userId":
+                    "type": "string"
+                    "description": "The unique identifier of the authenticated user."
+                  "email":
+                    "type": "string"
+                    "description": "The email address of the authenticated user."
+                  "token":
+                    "type": "string"
+                    "description": "The JWT token for authenticating subsequent requests."
+        "400":
+          "description": "Invalid input."
+        "422":
+          "description": "User already exists."
+        "500":
+          "description": "Internal server error."
+  "/api/users/login":
+    "post":
+      "tags":
+        - "userRoute"
+      "summary": "User login"
+      "description": "Authenticate and login a user."
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "properties":
+                "email":
+                  "type": "string"
+                  "description": "The email address of the user."
+                "password":
+                  "type": "string"
+                  "description": "The password of the user."
+              "required":
+                - "email"
+                - "password"
+      "responses":
+        "200":
+          "description": "User successfully logged in."
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "properties":
+                  "userId":
+                    "type": "string"
+                    "description": "The unique identifier of the authenticated user."
+                  "email":
+                    "type": "string"
+                    "description": "The email address of the authenticated user."
+                  "token":
+                    "type": "string"
+                    "description": "The JWT token for authenticating subsequent requests."
+        "401":
+          "description": "Invalid credentials."
+        "403":
+          "description": "User does not exist."
+        "500":
+          "description": "Internal server error."
+  "/api/places/{pid}":
+    "get":
+      "tags":
+        - "placeRoute"
+      "summary": "Get place by ID"
+      "parameters":
+        -
+          "in": "path"
+          "name": "pid"
+          "required": true
+          "description": "The ID of the place to retrieve"
+          "schema":
+            "type": "string"
+      "responses":
+        "200":
+          "description": "Successful response"
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "properties":
+                  "_id":
+                    "type": "string"
+                    "description": "The unique identifier of the place."
+                  "title":
+                    "type": "string"
+                    "description": "The title of the place."
+                  "description":
+                    "type": "string"
+                    "description": "A description of the place."
+                  "address":
+                    "type": "string"
+                    "description": "The address of the place."
+                  "location":
+                    "type": "object"
+                    "properties":
+                      "lat":
+                        "type": "number"
+                        "description": "The latitude coordinate of the place."
+                      "lng":
+                        "type": "number"
+                        "description": "The longitude coordinate of the place."
+                  "creator":
+                    "type": "string"
+                    "description": "The ID of the user who created the place."
+                  "createdAt":
+                    "type": "string"
+                    "format": "date-time"
+                    "description": "The date and time when the place was created."
+                  "updatedAt":
+                    "type": "string"
+                    "format": "date-time"
+                    "description": "The date and time when the place was last updated."
+                "required":
+                  - "title"
+                  - "description"
+                  - "address"
+                  - "location"
+                  - "creator"
+                  - "createdAt"
+                  - "updatedAt"
+        "404":
+          "description": "Place not found"
+        "500":
+          "description": "Internal server error"
+    "patch":
+      "tags":
+        - "placeRoute"
+      "summary": "Update a place, update require user token to update place. Note:use postman"
+      "parameters":
+        -
+          "in": "path"
+          "name": "pid"
+          "required": true
+          "description": "The ID of the place to update"
+          "schema":
+            "type": "string"
+      "requestBody":
+        "required": true
+        "content":
+          "application/json":
+            "schema":
+              "type": "object"
+              "properties":
+                "title":
+                  "type": "string"
+                "description":
+                  "type": "string"
+              "required":
+                - "title"
+                - "description"
+      "responses":
+        "200":
+          "description": "Place updated successfully"
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "properties":
+                  "_id":
+                    "type": "string"
+                    "description": "The unique identifier of the place."
+                  "title":
+                    "type": "string"
+                    "description": "The title of the place."
+                  "description":
+                    "type": "string"
+                    "description": "A description of the place."
+                  "address":
+                    "type": "string"
+                    "description": "The address of the place."
+                  "location":
+                    "type": "object"
+                    "properties":
+                      "lat":
+                        "type": "number"
+                        "description": "The latitude coordinate of the place."
+                      "lng":
+                        "type": "number"
+                        "description": "The longitude coordinate of the place."
+                  "creator":
+                    "type": "string"
+                    "description": "The ID of the user who created the place."
+                  "createdAt":
+                    "type": "string"
+                    "format": "date-time"
+                    "description": "The date and time when the place was created."
+                  "updatedAt":
+                    "type": "string"
+                    "format": "date-time"
+                    "description": "The date and time when the place was last updated."
+                "required":
+                  - "title"
+                  - "description"
+                  - "address"
+                  - "location"
+                  - "creator"
+                  - "createdAt"
+                  - "updatedAt"
+        "404":
+          "description": "Place not found"
+        "422":
+          "description": "Invalid input data"
+        "500":
+          "description": "Internal server error"
+    "delete":
+      "tags":
+        - "placeRoute"
+      "summary": "Delete a place, delete a place require user token. Note:use postman"
+      "parameters":
+        - "in": "path"
+          "name": "pid"
+          "required": true
+          "description": "The ID of the place to delete"
+          "schema":
+            "type": "string"
+        - "name" : "token"
+          "in" : "header"
+          "description": "Send the token to validate the user"
+          "required" : "true"
+          "type" : "string"
+      "responses":
+        "200":
+          "description": "Place deleted successfully"
+        "404":
+          "description": "Place not found"
+        "500":
+          "description": "Internal server error"      
+  "/api/places/user/{uid}":
+    "get":
+      "tags":
+        - "placeRoute"
+      "summary": "Get places by user ID"
+      "parameters":
+        -
+          "in": "path"
+          "name": "uid"
+          "required": true
+          "description": "The ID of the user"
+          "schema":
+            "type": "string"
+      "responses":
+        "200":
+          "description": "Successful response"
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "properties":
+                  "places":
+                    "type": "array"
+                    "items":
+                      "type": "object"
+                      "properties":
+                        "_id":
+                          "type": "string"
+                          "description": "The unique identifier of the place."
+                        "title":
+                          "type": "string"
+                          "description": "The title of the place."
+                        "description":
+                          "type": "string"
+                          "description": "A description of the place."
+                        "address":
+                          "type": "string"
+                          "description": "The address of the place."
+                        "location":
+                          "type": "object"
+                          "properties":
+                            "lat":
+                              "type": "number"
+                              "description": "The latitude coordinate of the place."
+                            "lng":
+                              "type": "number"
+                              "description": "The longitude coordinate of the place."
+                        "creator":
+                          "type": "string"
+                          "description": "The ID of the user who created the place."
+                        "createdAt":
+                          "type": "string"
+                          "format": "date-time"
+                          "description": "The date and time when the place was created."
+                        "updatedAt":
+                          "type": "string"
+                          "format": "date-time"
+                          "description": "The date and time when the place was last updated."
+                      "required":
+                        - "title"
+                        - "description"
+                        - "address"
+                        - "location"
+                        - "creator"
+                        - "createdAt"
+                        - "updatedAt"
+        "404":
+          "description": "User not found"
+        "500":
+          "description": "Internal server error"
+  "/api/places":
+    "post":
+      "tags":
+        - "placeRoute"
+      "summary": "Create a new place"
+      "requestBody":
+        "required": true
+        "content":
+          "multipart/form-data":
+            "schema":
+              "type": "object"
+              "properties":
+                "title":
+                  "type": "string"
+                "description":
+                  "type": "string"
+                "address":
+                  "type": "string"
+                "image":
+                  "type": "string"
+                  "format": "binary"
+              "required":
+                - "title"
+                - "description"
+                - "address"
+                - "image"
+      "responses":
+        "201":
+          "description": "Place created successfully"
+          "content":
+            "application/json":
+              "schema":
+                "type": "object"
+                "properties":
+                  "_id":
+                    "type": "string"
+                    "description": "The unique identifier of the place."
+                  "title":
+                    "type": "string"
+                    "description": "The title of the place."
+                  "description":
+                    "type": "string"
+                    "description": "A description of the place."
+                  "address":
+                    "type": "string"
+                    "description": "The address of the place."
+                  "location":
+                    "type": "object"
+                    "properties":
+                      "lat":
+                        "type": "number"
+                        "description": "The latitude coordinate of the place."
+                      "lng":
+                        "type": "number"
+                        "description": "The longitude coordinate of the place."
+                  "creator":
+                    "type": "string"
+                    "description": "The ID of the user who created the place."
+                  "createdAt":
+                    "type": "string"
+                    "format": "date-time"
+                    "description": "The date and time when the place was created."
+                  "updatedAt":
+                    "type": "string"
+                    "format": "date-time"
+                    "description": "The date and time when the place was last updated."
+                "required":
+                  - "title"
+                  - "description"
+                  - "address"
+                  - "location"
+                  - "creator"
+                  - "createdAt"
+                  - "updatedAt"
+        "422":
+          "description": "Invalid input data"
+        "500":
+          "description": "Internal server error"
+"components":
+  "schemas":
+    "User":
+      "type": "object"
+      "properties":
+        "_id":
+          "type": "string"
+          "description": "The unique identifier of the user."
+        "name":
+          "type": "string"
+          "description": "The name of the user."
+        "email":
+          "type": "string"
+          "description": "The email address of the user."
+        "image":
+          "type": "string"
+          "description": "The profile image URL of the user."
+      "required":
+        - "name"
+        - "email"
+        - "image"
+    "Place":
+      "type": "object"
+      "properties":
+        "_id":
+          "type": "string"
+          "description": "The unique identifier of the place."
+        "title":
+          "type": "string"
+          "description": "The title of the place."
+        "description":
+          "type": "string"
+          "description": "A description of the place."
+        "address":
+          "type": "string"
+          "description": "The address of the place."
+        "location":
+          "type": "object"
+          "properties":
+            "lat":
+              "type": "number"
+              "description": "The latitude coordinate of the place."
+            "lng":
+              "type": "number"
+              "description": "The longitude coordinate of the place."
+        "creator":
+          "type": "string"
+          "description": "The ID of the user who created the place."
+        "createdAt":
+          "type": "string"
+          "format": "date-time"
+          "description": "The date and time when the place was created."
+        "updatedAt":
+          "type": "string"
+          "format": "date-time"
+          "description": "The date and time when the place was last updated."
+      "required":
+        - "title"
+        - "description"
+        - "address"
+        - "location"
+        - "creator"
+        - "createdAt"
+        - "updatedAt"
+    "SignupRequest":
+      "type": "object"
+      "properties":
+        "name":
+          "type": "string"
+          "description": "The name of the user."
+        "email":
+          "type": "string"
+          "description": "The email address of the user."
+        "password":
+          "type": "string"
+          "description": "The password of the user."
+        "image":
+          "type": "string"
+          "format": "binary"
+          "description": "The profile image file of the user."
+      "required":
+        - "name"
+        - "email"
+        - "password"
+        - "image"
+    "LoginRequest":
+      "type": "object"
+      "properties":
+        "email":
+          "type": "string"
+          "description": "The email address of the user."
+        "password":
+          "type": "string"
+          "description": "The password of the user."
+      "required":
+        - "email"
+        - "password"
+    "AuthResponse":
+      "type": "object"
+      "properties":
+        "userId":
+          "type": "string"
+          "description": "The unique identifier of the authenticated user."
+        "email":
+          "type": "string"
+          "description": "The email address of the authenticated user."
+        "token":
+          "type": "string"
+          "description": "The JWT token for authenticating subsequent requests."
